@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rasoi Diaries</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffebee;
+            padding-top: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1{
+            color: rgb(198, 0, 0);
+        }
+        h2, h3 {
+            color: #8e24aa;
+        }
+        .container {
+            width: 80%;
+            color: #333333 ;
+        }
+        .recipe-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .recipe-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid #db72cc ;
+        }
+        .recipe-card:hover {
+            transform: scale(1.05);
+        }
+        .recipe-card img {
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            object-position: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .recipe-details {
+            padding: 20px;
+        }
+        .add-recipe-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .modal-content {
+            border-radius: 10px;
+        }
+        .remove-btn,
+        .view-details-btn {
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            margin-right: 5px;
+        }
+        .view-details-btn {
+            background-color: #883b9d ;
+        }
+        .animate-scale {
+            animation: scaleUp 0.3s ease-in-out;
+        }
+        @keyframes scaleUp {
+            0% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .graphics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .graphics img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-center mb-4">Recipe Sharing Platform</h1>
+
+    <!-- <div class="graphics">
+        <img src="https://via.placeholder.com/150" alt="Graphic 1">
+        <img src="https://via.placeholder.com/150" alt="Graphic 2">
+    </div> -->
+
+    <div class="recipe-container" id="recipeContainer">
+        <!-- Recipe cards will be dynamically added here -->
+    </div>
+
+    <div class="add-recipe-form animate-scale">
+        <h2>Add Your Recipe</h2>
+        <form id="recipeForm">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="ingredients">Ingredients:</label>
+                <textarea class="form-control" id="ingredients" name="ingredients" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="procedure">Procedure:</label>
+                <textarea class="form-control" id="procedure" name="procedure" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="image">Image URL:</label>
+                <input type="text" class="form-control" id="image" name="image">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addRecipe()">Add Recipe</button>
+        </form>
+    </div>
+
+    <!-- Recipe Details Modal -->
+    <div class="modal fade" id="recipeModal" tabindex="-1" role="dialog" aria-labelledby="recipeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recipeModalLabel">Recipe Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="recipeModalBody">
+                    <!-- Recipe details will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="graphics">
+        <img src="https://via.placeholder.com/150" alt="Graphic 3">
+        <img src="https://via.placeholder.com/150" alt="Graphic 4">
+    </div> -->
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    const recipes = [
+        {
+            title: 'Spaghetti Bolognese',
+            description: 'Classic Italian pasta dish with meat sauce.',
+            ingredients: 'Pasta, Beef, Tomato Sauce',
+            procedure: '1. Boil pasta. 2. Cook beef with tomato sauce. 3. Mix pasta and sauce.',
+            image: 'https://source.unsplash.com/300x200/?spaghetti'
+        },
+        {
+            title: 'Panner Tikka Masala',
+            description: 'Quick and easy Paneer with vegetables.',
+            ingredients: 'Paneer, Vegetables, Soy Sauce',
+            procedure: '1. Stir-fry Panner. 2. Add vegetables. 3. Pour soy sauce.',
+            image: 'https://source.unsplash.com/300x200/?sabji'
+        },
+        {
+            title: 'Chocolate Chip Cookies',
+            description: 'Homemade cookies with chocolate chips.',
+            ingredients: 'Flour, Sugar, Chocolate Chips',
+            procedure: '1. Mix flour and sugar. 2. Add chocolate chips. 3. Bake until golden brown.',
+            image: 'https://source.unsplash.com/300x200/?cookies'
+        },
+    ];
+
+
+    function renderRecipes() {
+        const recipeContainer = document.getElementById('recipeContainer');
+        recipeContainer.innerHTML = '';
+
+        recipes.forEach((recipe, index) => {
+            const card = document.createElement('div');
+            card.classList.add('recipe-card', 'card', 'animate-scale');
+            card.innerHTML = `
+                <img src="${recipe.image}" alt="${recipe.title}" class="card-img-top">
+                <div class="recipe-details card-body">
+                    <h3 class="card-title">${recipe.title}</h3>
+                    <p class="card-text">${recipe.description}</p>
+                    <p class="card-text"><strong>Ingredients:</strong> ${recipe.ingredients}</p>
+                    <button class="view-details-btn btn btn-info" onclick="showRecipeDetails(${index})">View Details</button>
+                    <button class="remove-btn btn" onclick="removeRecipe(${index})">Remove</button>
+                </div>
+            `;
+            recipeContainer.appendChild(card);
+        });
+    }
+
+    function addRecipe() {
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const ingredients = document.getElementById('ingredients').value;
+        const procedure = document.getElementById('procedure').value;
+        const image = document.getElementById('image').value;
+
+        if (title && description && procedure) {
+            recipes.push({ title, description, ingredients, procedure, image });
+            renderRecipes();
+            document.getElementById('recipeForm').reset();
+        } else {
+            alert('Please fill in title, description, and procedure.');
+        }
+    }
+
+    function showRecipeDetails(index) {
+        const recipeModalBody = document.getElementById('recipeModalBody');
+        recipeModalBody.innerHTML = `
+            <h3>${recipes[index].title}</h3>
+            <p>${recipes[index].description}</p>
+            <p><strong>Ingredients:</strong> ${recipes[index].ingredients}</p>
+            <p><strong>Procedure:</strong> ${recipes[index].procedure}</p>
+            <img src="${recipes[index].image}" alt="${recipes[index].title}" class="img-fluid">
+        `;
+
+        $('#recipeModal').modal('show');
+    }
+
+    function removeRecipe(index) {
+        recipes.splice(index, 1);
+        renderRecipes();
+    }
+
+    renderRecipes();
+</script>
+<footer><div class="footer-info">
+    <p>&copy; 2023 Recipe Sharing Platform. All rights reserved.</p>
+</div>
+</footer>
+
+
+</body>
+</html>
